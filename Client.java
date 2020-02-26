@@ -12,7 +12,7 @@ public class Client {
 
     public static void main(String[] args) throws IOException, InterruptedException{
         DatagramSocket ds = new DatagramSocket(2223); 
-        InetAddress ip = InetAddress.getByName("10.9.9.10");
+        InetAddress ip = InetAddress.getByName("10.9.9.2");
   
         byte buf[] = null; 
         byte[] recieves = new byte[65535];
@@ -21,7 +21,7 @@ public class Client {
   
         // loop while user not enters "bye" 
         while (true) 
-        { 
+        {
             long startTime = System.nanoTime();
             String stString = Long.toString(startTime);
             // convert the String input into the byte array. 
