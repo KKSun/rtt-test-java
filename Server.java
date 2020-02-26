@@ -1,52 +1,41 @@
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.lang.ClassNotFoundException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 
 
 /**
- * This class implements java Socket server
+ * This class implements java socket client
  * @author pankaj
  *
  */
 public class Server {
-    
-    //static ServerSocket variable
-    private static ServerSocket server;
-    //socket server port on which it will listen
-    private static int port = 5555;
-    static String msg = "m";
-    
-    public static void main(String args[]) throws IOException, ClassNotFoundException{
-        //create the socket server object
-        server = new ServerSocket(port);
-        //keep listens indefinitely until receives 'exit' call or program terminates
+
+    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
+        DatagramSocket ds = new DatagramSocket(3334);
+        byte[] recieve = new byte[65535];
+        DatagramPacket DpRecieve = null;
+        byte buf[] = null;
+        //ds.setSoTimeout(1000);
+        InetAddress ip = InetAddress.getByName("172.31.41.54");
+
         while(true){
-            System.out.println("Waiting for the client request");
-            //creating socket and waiting for client connection
-            Socket socket = server.accept();
-            //read from socket to ObjectInputStream object
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
-            // //convert ObjectInputStream object to String
-            String message = (String) ois.readObject();
-            // System.out.println("Message Received.");
-            //create ObjectOutputStream object
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            //write object to Socket
-            long msg = System.nanoTime();
-            oos.writeObject(msg);
-            //close resources
-            ois.close();
-            oos.close();
-            socket.close();
-            //terminate the server if client sends exit request
-            // if(message.equalsIgnoreCase("exit")) break;
+            DpRecieve = new DatagramPacket(recieve, recieve.length);
+            ds.receive(DpRecieve);
+            // System.out.println(new String(recieve));
+            String startTime = new String(recieve);
+            long stLong = Long.parseLong(startTime.trim());
+            System.out.println(stLong);
+            long middleTime = System.nanoTime();
+            String mtString = Long.toString(middleTime);
+            long half_rtt = middleTime - stLong;
+            buf = mtString.getBytes();
+            DatagramPacket Dpsend = new DatagramPacket(buf, buf.length, ip, 2223);
+            ds.send(Dpsend);
+            System.out.println("respond sent");
+            recieve = new byte[65535];
         }
-        //System.out.println("Shutting down Socket server!!");
-        //close the ServerSocket object
-        //server.close();
     }
-    
 }
