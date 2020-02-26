@@ -1,9 +1,7 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.IOException; 
+import java.net.DatagramPacket; 
+import java.net.DatagramSocket; 
+import java.net.InetAddress; 
 
 /**
  * This class implements java socket client
@@ -12,33 +10,37 @@ import java.net.UnknownHostException;
  */
 public class Client {
 
-    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
-        //get the localhost IP address, if server is running on some other IP, you need to use that
-        InetAddress host = InetAddress.getLocalHost();
-        Socket socket = null;
-        ObjectOutputStream oos = null;
-        ObjectInputStream ois = null;
-        while(true){
-            //establish socket connection to server
-            socket = new Socket(host.getHostName(), 5555);
-            //write to socket using ObjectOutputStream
-            oos = new ObjectOutputStream(socket.getOutputStream());
-            // System.out.println("Sending request to Socket Server");
+    public static void main(String[] args) throws IOException, InterruptedException{
+        DatagramSocket ds = new DatagramSocket(2223); 
+        InetAddress ip = InetAddress.getByName("10.9.9.10");
+  
+        byte buf[] = null; 
+        byte[] recieves = new byte[65535];
+        DatagramPacket DpRecieve = null;
+        //ds.setSoTimeout(1000);
+  
+        // loop while user not enters "bye" 
+        while (true) 
+        { 
             long startTime = System.nanoTime();
-            oos.writeObject("");
-            //read the server response message
-            ois = new ObjectInputStream(socket.getInputStream());
-            long reachTime = (long) ois.readObject();
+            String stString = Long.toString(startTime);
+            // convert the String input into the byte array. 
+            buf = stString.getBytes(); 
+  
+            // Step 2 : Create the datagramPacket for sending 
+            // the data. 
+            DatagramPacket DpSend = 
+                  new DatagramPacket(buf, buf.length, ip, 3334); 
+  
+            // Step 3 : invoke the send call to actually send 
+            // the data. 
+            ds.send(DpSend);
+            DpRecieve = new DatagramPacket(recieves, recieves.length);
+            ds.receive(DpRecieve);
             long endTime = System.nanoTime();
             long rtt = endTime - startTime;
-            // System.out.println("t1 = " + (reachTime - startTime));
-            // System.out.println("t2 = " + (endTime - reachTime));
-            // System.out.println("rtt = " + rtt);
-            System.out.println((reachTime - startTime) + " " + (endTime - reachTime) + " " + rtt);
-            //close resources
-            ois.close();
-            oos.close();
-            Thread.sleep(100);
+            System.out.println(rtt);
+            Thread.sleep(500);
         }
     }
 }
