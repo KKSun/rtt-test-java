@@ -5,37 +5,32 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 
-
-/**
- * This class implements java socket client
- * @author pankaj
- *
- */
 public class Server {
 
     public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
-        DatagramSocket ds = new DatagramSocket(3334);
-        byte[] recieve = new byte[65535];
+        DatagramSocket socket = new DatagramSocket(2333);
+        byte[] recieve = new byte[100];
         DatagramPacket DpRecieve = null;
-        byte buf[] = null;
-        //ds.setSoTimeout(1000);
-        InetAddress ip = InetAddress.getByName("172.31.41.54");
+        byte buf[] = new byte[100];
+        DatagramPacket Dpsend = null;
+        InetAddress ip = InetAddress.getByName("127.0.0.1");
 
         while(true){
             DpRecieve = new DatagramPacket(recieve, recieve.length);
-            ds.receive(DpRecieve);
-            // System.out.println(new String(recieve));
-            String startTime = new String(recieve);
-            long stLong = Long.parseLong(startTime.trim());
-            System.out.println(stLong);
-            long middleTime = System.nanoTime();
-            String mtString = Long.toString(middleTime);
-            long half_rtt = middleTime - stLong;
-            buf = mtString.getBytes();
-            DatagramPacket Dpsend = new DatagramPacket(buf, buf.length, ip, 2223);
-            ds.send(Dpsend);
-            System.out.println("respond sent");
-            recieve = new byte[65535];
+            socket.receive(DpRecieve);
+            String seq = new String(recieve);
+            System.out.println(seq.length());
+            fillBuf(buf, seq);
+            Dpsend = new DatagramPacket(buf, buf.length, ip, 3444);
+            socket.send(Dpsend);
+            recieve = new byte[100];
+            buf = new byte[100];
+        }
+    }
+
+    static void fillBuf(byte[] buf, String seq){
+        for(int i = 0; i < 100; i++){
+            buf[i] = seq.getBytes()[i];
         }
     }
 }
