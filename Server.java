@@ -2,19 +2,17 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 
 public class Server {
 
-    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, InterruptedException{
+    public static void main(String[] args) throws IOException {
         DatagramSocket socket = new DatagramSocket(2333);
         byte[] recieve = new byte[100];
         DatagramPacket DpRecieve = null;
         byte buf[] = new byte[100];
         DatagramPacket Dpsend = null;
-        InetAddress ip = InetAddress.getByName("127.0.0.1");
-
+        InetAddress ip = InetAddress.getByName("10.9.9.2");
+        System.out.println("server start...");
         while(true){
             DpRecieve = new DatagramPacket(recieve, recieve.length);
             socket.receive(DpRecieve);
@@ -24,7 +22,7 @@ public class Server {
             socket.send(Dpsend);
             System.out.println("respond sent, seq: " + seq + " | buf length: " + buf.length + ".");
             recieve = new byte[100];
-            buf = new byte[100];
+            buf = new byte[100];            
         }
     }
 
